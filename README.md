@@ -4,7 +4,7 @@ This project contains the source files to reproduce the results of experiments o
 Licence
 -------
 
-MGO is licenced under the GNU Affero GPLv3 software licence. 
+This software is licenced under the GNU Affero GPLv3 software licence. 
 
 Usage
 -----
