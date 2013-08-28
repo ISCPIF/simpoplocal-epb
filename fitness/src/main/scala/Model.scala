@@ -19,29 +19,26 @@
 
 package fr.geocite.simpoplocal.exploration
 
-import fr.geocite.simpoplocal._
 import java.util.Random
 
 object Model {
 
-  def disaster(
+  def run(
     _rMax: Double,
     _innovationImpact: Double,
     _distanceDecay: Double,
     _pCreation: Double,
     _pDiffusion: Double,
-    _disasterProbability: Double,
     _maxInnovation: Double,
     _innovationLife: Int)(implicit rng: Random): ModelResult = {
     val simu =
-      new SimpopLocal with RandomDisaster with InnovationLife {
+      new SimpopLocal {
         def distanceDecay = _distanceDecay
         def pDiffusion = _pDiffusion
         def pCreation = _pCreation
         def innovationImpact = _innovationImpact
         def maxInnovation = _maxInnovation
         def rMax = _rMax
-        def disasterProbability = _disasterProbability
         override def innovationLife = _innovationLife
       }
     ModelResult(simu.run(new util.Random(rng)))
@@ -69,6 +66,5 @@ object Model {
     ModelResult(simu.run)
 
   }     */
-
 
 }

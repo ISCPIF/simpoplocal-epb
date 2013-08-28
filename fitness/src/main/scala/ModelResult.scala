@@ -1,7 +1,5 @@
-import scala.util.Random
-
 /*
- * Copyright (C) 25/04/13 Romain Reuillon
+ * Copyright (C) 28/01/13 Romain Reuillon
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -17,19 +15,21 @@ import scala.util.Random
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-object Launcher extends App {
+package fr.geocite.simpoplocal.exploration
 
-  val m = new SimpopLocal {
-    def distanceDecay: Double = 0.695
-    def innovationImpact: Double = 0.0085
-    def maxInnovation: Double = 10000
-    def pCreation: Double = 8.67E-07
-    def pDiffusion: Double = 8.67E-07
-    def rMax: Double = 10586
-  }
+object ModelResult {
 
-  implicit val rng = new Random(42)
+  def apply(state: SimpopLocal#SimpopLocalState) =
+    new ModelResult {
+      val time = state.step
+      val populationMax = state.settlements.map { _.population }.max
+      val population = state.settlements.map { _.population }.sorted.toArray
+    }
 
-  println(m.run)
+}
 
+trait ModelResult {
+  def time: Int
+  def populationMax: Double
+  def population: Array[Double]
 }

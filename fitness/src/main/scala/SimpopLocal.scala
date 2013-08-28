@@ -15,6 +15,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package fr.geocite.simpoplocal.exploration
+
 import scala.collection.immutable.TreeSet
 import scala.collection.mutable.ListBuffer
 import scala.io.Source

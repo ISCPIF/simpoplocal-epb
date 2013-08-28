@@ -6,8 +6,6 @@ version := "1.0.0"
 
 scalaVersion := "2.10.2"
 
-libraryDependencies += "fr.geocite" %% "simpoplocal" % "0.1-SNAPSHOT"
-
 libraryDependencies += "ca.umontreal.iro" % "ssj" % "2.5" excludeAll(
   ExclusionRule(organization = "dsol"), 
   ExclusionRule(organization = "jfree"), 
