@@ -19,8 +19,7 @@ sbt run
 To build the openmole plugin:
 sbt publish-local
 
-Get the plugin in your local ivy repository.
-/home/reuillon/.ivy2/local/fr.geocite.simpoplocal/exploration_2.10/1.0.0/bundles/exploration_2.10.jar
+Get the plugin in your local ivy repository, for instance: /home/reuillon/.ivy2/local/fr.geocite.simpoplocal/exploration_2.10/1.0.0/bundles/exploration_2.10.jar.
 
 To use it in OpenMoLE (www.openmole.org) launch OpenMoLE with: openmole -c -p /path/to/exploration_2.10.jar.
 
