@@ -1,4 +1,4 @@
-logger.level("FINE")
+logger.level("INFO")
 
 import org.openmole.plugin.domain.distribution._
 import org.openmole.plugin.domain.modifier._
@@ -89,11 +89,13 @@ val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
 import org.openmole.plugin.builder.evolution._
 import org.openmole.plugin.method.evolution._
  
+//, diversityMetric = GA.hypervolume(500, 100000, 10000)
+
 val evolution = 
   GA (
     algorithm = GA.optimization(200, dominance = GA.strictEpsilon(0.0, 10.0, 10.0), diversityMetric = GA.hypervolume(500, 100000, 10000)),
     lambda = 1,
-    termination = GA.timed(60 * 120 * 1000),
+    termination = GA.timed(60 * 60 * 1000),
     cloneProbability = 0.01
   )
 
@@ -105,7 +107,7 @@ val nsga2  =
     List(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
   )
 
-val islandModel = islandGA(nsga2)("island", 2000, GA.counter(100000), 50)
+val islandModel = islandGA(nsga2)("island", 5000, GA.counter(200000), 50)
 
 val mole = islandModel
 
@@ -118,7 +120,7 @@ val display = DisplayHook("Generation ${" + islandModel.generation.name + "}, co
 
 val ex = MoleExecution(
       mole,
-      selection = Map(islandModel.island -> env),
+      environments = Map(islandModel.island -> env),
       hooks = List(islandModel.outputCapsule -> saveParetoHook, islandModel.outputCapsule -> display)
     )
 
