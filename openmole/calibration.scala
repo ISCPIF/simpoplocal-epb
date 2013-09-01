@@ -56,11 +56,9 @@ modelTask.addOutput(modelResult)
 // Define the task which evaluate a single replication
 val evalTask = 
   GroovyTask("EvalTask",
-    "lognorm = new LogNormalKSTest() \n" + 
-    "ksValue =  new Double(lognorm.getResultTest(modelResult.population).count(false)) \n" + 
-    "deltaTest = new DeltaTest() \n" +  
-    "deltaPop = deltaTest.getResultTest(modelResult.population, 10000) \n" + 
-    "deltaTime = deltaTest.getResultTest(modelResult.time, 4000) \n"
+    "ksValue =  new Double(LogNormalKSTest.test(modelResult.population).count(false)) \n" + 
+    "deltaPop = DeltaTest.delta(modelResult.population, 10000) \n" + 
+    "deltaTime = DeltaTest.delta(modelResult.time, 4000) \n"
   )
 
 evalTask.addImport("fr.geocite.simpoplocal.exploration.*")

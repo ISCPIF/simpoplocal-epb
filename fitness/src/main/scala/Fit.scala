@@ -21,15 +21,12 @@ object Fit {
 
   def apply(state: SimpopLocal#SimpopLocalState): Fit = apply(ModelResult(state))
 
-  def apply(result: ModelResult, populationObj: Int = 10000, timeObj: Int = 4000): Fit = {
-    val lognorm = new LogNormalKSTest
-    val deltaTest = new DeltaTest
+  def apply(result: ModelResult, populationObj: Int = 10000, timeObj: Int = 4000): Fit =
     Fit(
-      ks = lognorm.getResultTest(result.population).count(_ == false).toDouble,
-      deltaPop = deltaTest.getResultTest(result.population, populationObj),
-      deltaTime = deltaTest.getResultTest(result.time, timeObj)
+      ks = LogNormalKSTest.test(result.population).count(_ == false).toDouble,
+      deltaPop = DeltaTest.delta(result.population, populationObj),
+      deltaTime = DeltaTest.delta(result.time, timeObj)
     )
-  }
 
 }
 

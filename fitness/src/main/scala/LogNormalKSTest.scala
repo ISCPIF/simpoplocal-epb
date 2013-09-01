@@ -11,7 +11,7 @@ import umontreal.iro.lecuyer.probdist.LognormalDist
 import umontreal.iro.lecuyer.probdist._
 import umontreal.iro.lecuyer.gof.GofStat._
 
-class LogNormalKSTest {
+object LogNormalKSTest {
 
   def evalKs(sample: Array[Double], dist: LognormalDist) = {
     val data = new DoubleArrayList(sample)
@@ -23,7 +23,7 @@ class LogNormalKSTest {
 
   def computeMLE(sizeSample: Int, sample: Array[Double]): Array[Double] = LognormalDist.getMLE(sample, sizeSample)
 
-  def getResultTest(samples: Array[Double]): Array[Boolean] = {
+  def test(samples: Array[Double]): Array[Boolean] = {
     try {
       val dist = {
         val mle = computeMLE(samples.size, samples)

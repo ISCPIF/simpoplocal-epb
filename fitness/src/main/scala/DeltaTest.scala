@@ -4,11 +4,8 @@
  */
 
 package fr.geocite.simpoplocal.exploration
-import scala.util.Sorting._
-class DeltaTest {
 
-  def getResultTest(simulValue: Array[Double], theoricalValue: Double): Double = math.abs(simulValue.max - theoricalValue)
-
-  def getResultTest(simulValue: Double, theoricalValue: Double): Double = math.abs(simulValue - theoricalValue)
-
+object DeltaTest {
+  def delta(simulValue: Array[Double], theoricalValue: Double): Double = math.abs(simulValue.max - theoricalValue)
+  def delta(simulValue: Double, theoricalValue: Double): Double = math.abs(simulValue - theoricalValue)
 }
