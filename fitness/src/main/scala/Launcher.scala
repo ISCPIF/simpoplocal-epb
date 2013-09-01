@@ -41,8 +41,8 @@ object Launcher extends App {
   }
 
   val distribution = fitnesses.map { case Fit(d, _, _) => d }.sum
-  val population = fitnesses.map { case Fit(_, p, _) => p }.sum / replications
-  val duration = fitnesses.map { case Fit(_, _, d) => d }.sum / replications
+  val population = Median(fitnesses.map { case Fit(_, p, _) => p }.toArray)
+  val duration = Median(fitnesses.map { case Fit(_, _, d) => d }.toArray)
 
   println(s"Fitness: distribution = $distribution, population = $population, duration = $duration")
 

@@ -74,24 +74,16 @@ val evalCapsule = Capsule(evalTask)
 
 val eval = modelCapsule -- evalCapsule
 
-// STOCHASTICITY OUTPUT ///////////////////////////////////////////////
-
-val stat = new Statistics
+val stat = Statistics()
 stat.addSum(ksValue, sumKsFailValue)
 stat.addMedian(deltaPop, medPop)
 stat.addMedian(deltaTime, medTime)
-//stat.addMedianAbsoluteDeviation(deltaPop, medADDeltaPop)
-//stat.addMedianAbsoluteDeviation(deltaTime, medADDeltaTime)
 
-val seedFactor = Factor(seed, new UniformLongDistribution take 100)
+val seedFactor = Factor(seed, UniformLongDistribution() take 100)
 val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
-
-// SCALING //////////////////////////////////////////////////
 
 import org.openmole.plugin.builder.evolution._
 import org.openmole.plugin.method.evolution._
- 
-//, diversityMetric = GA.hypervolume(500, 100000, 10000)
 
 val evolution = 
   GA (
