@@ -1,7 +1,12 @@
+// This workflow compute accurate fitnesses (using 10000 replications) for
+// set of parameters of the simpop local model.
+
 logger.level("FINE")
 
+import org.openmole.plugin.sampling.combine._
 import org.openmole.plugin.domain.distribution._
 import org.openmole.plugin.domain.modifier._
+import org.openmole.plugin.domain.collection._
 import org.openmole.plugin.task.groovy._
 import org.openmole.plugin.domain.bounded._
 import org.openmole.plugin.hook.file._
@@ -10,6 +15,7 @@ import org.openmole.plugin.builder.stochastic._
 import org.openmole.plugin.grouping.batch._
 import org.openmole.plugin.environment.glite._
 import org.openmole.plugin.environment.desktopgrid._
+import org.openmole.plugin.source.file._
 
 import fr.geocite.simpoplocal.exploration._
 
@@ -32,14 +38,18 @@ val sumKsFailValue = Prototype[Double]("sumKsFailValue")
 val medPop = Prototype[Double]("medPop")
 val medTime = Prototype[Double]("medTime")
 
-val medADDeltaPop = Prototype[Double]("medADDeltaPop")
-val medADDeltaTime = Prototype[Double]("medADDeltaTime")
-   
+val sampling = 
+  rMax.toArray.toFactor zip distanceDecay.toArray.toFactor zip pCreation.toArray.toFactor zip pDiffusion.toArray.toFactor zip innovationImpact.toArray.toFactor
+
+val explo = ExplorationTask("explo", sampling)
+val exploCapsule = Capsule(explo)
+
 val modelTask = 
   GroovyTask(
     "modelTask", "modelResult = Model.run(rMax,innovationImpact,distanceDecay,pCreation,pDiffusion, 10000, 4000, newRNG(seed)) \n")
 
 modelTask.addImport("fr.geocite.simpoplocal.exploration.*")
+
 
 modelTask.addInput(rMax)
 modelTask.addInput(distanceDecay)
@@ -58,7 +68,7 @@ val evalTask =
     "deltaTime = deltaTest.getResultTest(modelResult.time, 4000) \n"
   )
 
-evalTask.addImport("fr.geocite.simpoplocal.exploration.*")
+evalTask.addImport("fr.geocite.simpoplocal.*")
 evalTask.addImport("org.apache.commons.math.random.*")
 evalTask.addImport("umontreal.iro.lecuyer.probdist.*")
 
@@ -78,48 +88,28 @@ val stat = new Statistics
 stat.addSum(ksValue, sumKsFailValue)
 stat.addMedian(deltaPop, medPop)
 stat.addMedian(deltaTime, medTime)
-//stat.addMedianAbsoluteDeviation(deltaPop, medADDeltaPop)
-//stat.addMedianAbsoluteDeviation(deltaTime, medADDeltaTime)
 
-val seedFactor = Factor(seed, new UniformLongDistribution take 100)
+val seedFactor = Factor(seed, new UniformLongDistribution take 10000)
 val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
-
-// SCALING //////////////////////////////////////////////////
-
-import org.openmole.plugin.builder.evolution._
-import org.openmole.plugin.method.evolution._
- 
-val evolution = 
-  GA (
-    algorithm = GA.optimization(200, dominance = GA.strictEpsilon(0.0, 10.0, 10.0), diversityMetric = GA.hypervolume(500, 100000, 10000)),
-    lambda = 1,
-    termination = GA.timed(60 * 120 * 1000),
-    cloneProbability = 0.01
-  )
-
-val nsga2  = 
-  steadyGA(evolution)(
-    "calibrateModel",
-    replicateModel, 
-    List(rMax -> ("2.0", "1000.0"), distanceDecay -> ("0.0", "4.0"), pCreation -> ("0.0" -> "0.01"), pDiffusion -> ("0.0", "0.01"),  innovationImpact -> ("0.0", "2.0")),
-    List(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
-  )
-
-val islandModel = islandGA(nsga2)("island", 2000, GA.counter(100000), 50)
-
-val mole = islandModel
 
 val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
 
-val path = resPath
-val saveParetoHook = AppendToCSVFileHook(path + "pareto${" + islandModel.generation.name + "}.csv", islandModel.generation, islandModel.state, rMax.toArray, distanceDecay.toArray, pCreation.toArray, pDiffusion.toArray, innovationImpact.toArray, sumKsFailValue.toArray, medPop.toArray, medTime.toArray)
+val saveHook = AppendToCSVFileHook(resPath + "replication10000.csv", rMax, distanceDecay, pCreation, pDiffusion, innovationImpact, sumKsFailValue, medPop, medTime)
 
-val display = DisplayHook("Generation ${" + islandModel.generation.name + "}, convergence ${" + islandModel.state.name + "}")
+val readCSV = CSVSource(resPath + "pareto100001.csv")
+readCSV addColumn rMax
+readCSV addColumn distanceDecay
+readCSV addColumn pCreation
+readCSV addColumn pDiffusion
+readCSV addColumn innovationImpact
 
-val ex = MoleExecution(
-      mole,
-      selection = Map(islandModel.island -> env),
-      hooks = List(islandModel.outputCapsule -> saveParetoHook, islandModel.outputCapsule -> display)
-    )
+val ex = 
+  ((exploCapsule source readCSV) -< replicateModel).toExecution(
+      sources = Map(exploCapsule -> readCSV),
+      hooks = List(replicateModel.last -> saveHook),
+      environments = Map(modelCapsule -> env),
+      grouping = Map(modelCapsule -> new ByGrouping(500))
+  ) 
 
+ex.start
 

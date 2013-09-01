@@ -46,8 +46,10 @@ trait SimpopLocal {
   /// Length of time during which an innovation can be diffused from a settlement: passed this length of time this innovation becomes obsolete.
   def innovationLife: Int = 4000
 
+  /// Max number of simulation step (years)
   def maxDate = 4000
 
+  /// Max number of innovations that can be considered in the simulation
   def maxInnovation: Double
 
   /**
@@ -94,6 +96,11 @@ trait SimpopLocal {
    */
   implicit lazy val innovationOrdering = Ordering.by((_: Innovation).rootId)
 
+  /**
+   * Compute the initial state
+   * @param rng a random number generator
+   * @return the initial state of the simulation
+   */
   def initial(implicit rng: Random) =
     SimpopLocalState(0, readSettlements.map(_.toSettlement))
 
@@ -145,14 +152,33 @@ trait SimpopLocal {
     }.toArray.sortBy(_.id).toIndexedSeq
   }
 
-  case class Neighbor[T](neighbour: T, distance: Double)
+  /**
+   * Store a neighbour and it's distance to the original object
+   * @param neighbour the neighbour
+   * @param distance the distance to the original object
+   * @tparam T the type of neighbour considered (in this simulation settlements)
+   */
+  case class Neighbour[T](neighbour: T, distance: Double)
 
+  /**
+   * Compute the euclidean distance between two settlements
+   * @param p1 settlement 1
+   * @param p2 settlement 2
+   * @return the euclidean distance between settlement 1 and 2
+   */
   def distance(p1: ReadSettlement, p2: ReadSettlement): Double =
-    sqrt(pow((p1.x - p2.x), 2) + pow((p1.y - p2.y), 2))
+    sqrt(pow(p1.x - p2.x, 2) + pow(p1.y - p2.y, 2))
 
-  def neighbors(all: Seq[ReadSettlement], center: ReadSettlement) =
+  /**
+   * Find all the neighbours, i.e settlements at a distance smaller than the radius
+   * of a settlement.
+   * @param all all the settlements
+   * @param center the settlement at the center
+   * @return the settlements at a distance smaller than the radius of the center settlement
+   */
+  def neighbours(all: Seq[ReadSettlement], center: ReadSettlement) =
     all.map {
-      c => Neighbor(c, distance(center, c))
+      c => Neighbour(c, distance(center, c))
     }.filter {
       n => n.distance < center.radius && center.id != n.neighbour.id
     }
@@ -177,24 +203,35 @@ trait SimpopLocal {
         settlement.settlementClass match {
           case 1 =>
             //All settlements of class 1 are connected to all neighbouring settlements of class 1
-            neighbors(settlementsClass1, settlement)
+            neighbours(settlementsClass1, settlement)
           case 2 =>
             //All settlements of class 2 are connected to all neighbouring settlements (class 3 to 1)
-            neighbors(settlementsClass1, settlement) ++
-              neighbors(settlementsClass2, settlement) ++
-              neighbors(settlementsClass3, settlement)
+            neighbours(settlementsClass1, settlement) ++
+              neighbours(settlementsClass2, settlement) ++
+              neighbours(settlementsClass3, settlement)
           case 3 =>
             //All settlements of class 3 are connected to all neighbouring settlements (class 3 to 1)
-            neighbors(settlementsClass1, settlement) ++
-              neighbors(settlementsClass2, settlement) ++
-              neighbors(settlementsClass3, settlement)
+            neighbours(settlementsClass1, settlement) ++
+              neighbours(settlementsClass2, settlement) ++
+              neighbours(settlementsClass3, settlement)
         }
     }
   }
 
+  /**
+   * Build an iterator which lazily compute the state at each step of the
+   * simulation when traversed.
+   * @param rng a random number generator
+   * @return an iterator over the states of the simulation
+   */
   def states(implicit rng: Random) =
     Iterator.iterate(initial)(step).takeWhile(!ended(_))
 
+  /**
+   * Compute the last state of the simulation
+   * @param rng a random number generator
+   * @return the last state of the simulation
+   */
   def run(implicit rng: Random) = {
     def last(i: Iterator[SimpopLocalState]): SimpopLocalState = {
       val e = i.next
@@ -204,9 +241,20 @@ trait SimpopLocal {
     last(states)
   }
 
+  /**
+   * Compute the end of the simulation
+   * @param state the current state of the simulation
+   * @return true if the simulation is completed
+   */
   def ended(state: SimpopLocalState) =
-    state.step >= 4000 || state.currentInnovationId > maxInnovation
+    state.step >= maxDate || state.currentInnovationId > maxInnovation
 
+  /**
+   * Compute one step of the simulation
+   * @param state current state
+   * @param rng a random number generator
+   * @return the next state
+   */
   def step(state: SimpopLocalState)(implicit rng: Random) = {
     import state.settlements
 

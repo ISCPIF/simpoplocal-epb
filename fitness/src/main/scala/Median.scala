@@ -17,17 +17,26 @@
 
 package fr.geocite.simpoplocal.exploration
 
-object Fit {
+import scala.annotation.tailrec
 
-  def apply(state: SimpopLocal#SimpopLocalState): Fit = apply(ModelResult(state))
+// Code picked from stack overflow
+object Median {
 
-  def apply(result: ModelResult, populationObj: Int = 10000, timeObj: Int = 4000): Fit =
-    Fit(
-      ks = LogNormalKSTest.test(result.population).count(_ == false).toDouble,
-      deltaPop = DeltaTest.delta(result.population, populationObj),
-      deltaTime = DeltaTest.delta(result.time, timeObj)
-    )
+  def choosePivot(arr: Array[Double]) = arr(arr.size / 2)
+
+  @tailrec def findKMedian(arr: Array[Double], k: Int): Double = {
+    val a = choosePivot(arr)
+    val (s, b) = arr partition (a >)
+    if (s.size == k) a
+    // The following test is used to avoid infinite repetition
+    else if (s.isEmpty) {
+      val (s, b) = arr partition (a ==)
+      if (s.size > k) a
+      else findKMedian(b, k - s.size)
+    } else if (s.size < k) findKMedian(b, k - s.size)
+    else findKMedian(s, k)
+  }
+
+  def apply(arr: Array[Double]) = findKMedian(arr, (arr.size - 1) / 2)
 
 }
-
-case class Fit(ks: Double, deltaPop: Double, deltaTime: Double)
