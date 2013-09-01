@@ -36,7 +36,7 @@ object LogNormalKSTest {
       if (res > getDCritical(samples.size, samples.size)) resultTest(0) = false
       if (pValue(samples.size, res) < 0.05) resultTest(1) = false
 
-      resultTest
+      return resultTest
     } catch {
       case e: IllegalArgumentException => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING, "Numeric instability problem with log computation into MLE ssj function : " + samples.mkString(","), e)
       case e: Throwable => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING,"Another unknown error, try and fail to resolve 42 :/ ", e)
