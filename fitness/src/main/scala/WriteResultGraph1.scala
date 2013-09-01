@@ -15,34 +15,69 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fr.geocite.simpoplocal.exploration
-
 import fr.geocite.simpoplocal.exploration.writer.CSVWriter
+import fr.geocite.simpoplocal.exploration.SimpopLocal
 import scala.util.Random
-import java.io.{File, FileWriter, BufferedWriter}
+import java.io.{File, FileWriter, BufferedWriter, Writer}
 
-object WriteResultLauncher extends App {
+object WriteResultGraph1 extends App {
 
-  val replications = 100
+  val replications = 5
   val folderPath = "/tmp/"
+  val file = folderPath + "variabilityRankSize_" + replications.toString() + ".csv"
+
+  val writer = new BufferedWriter(new FileWriter(new File(file)))
 
   val m = new SimpopLocal {
     def distanceDecay: Double = 0.6948037684879382
+
     def innovationImpact: Double = 0.008514548363730353
+
     def maxInnovation: Double = 10000
+
     def pCreation: Double = 8.672482701792705E-7
+
     def pDiffusion: Double = 8.672482701792705E-7
+
     def rMax: Double = 10586
   }
 
   val rng = new Random(42)
 
-  val fitnesses = Iterator.continually(rng.nextLong).take(replications).toSeq.par.map {
-    seed =>
-      val file = folderPath + "slocal_" + seed.toString() + ".csv"
-      implicit val threadRng = new Random(seed)
-      new CSVWriter(file,0,seed,50).apply(m)(threadRng)
-
+  case class Q1(state: SimpopLocal#SimpopLocalState, s: Long) {
+    val final_step = state.step
+    val seed = s
+    val pop = state.settlements.map {
+      s => (s.id, s.population)
+    }
   }
 
+  val simulation = Iterator.continually(rng.nextLong).take(replications).toSeq.par.map {
+    seed =>
+      implicit val threadRng = new Random(seed)
+      new Q1(m.run, seed)
+  }.seq
+
+
+  println("Q1 max > " + simulation.map {
+    _.final_step
+  }.max)
+
+  try {
+      writer.append("v_idn, v_ticks, v_seed, v_pop" + "\n")
+
+      simulation.map {
+        s =>
+          println("seed = " + s.seed)
+          s.pop.map {
+            case (id, pop) =>
+              //println(" / -> id = " + id +  " / pop = " + pop)
+              writer.append(List[Any](id, s.final_step, s.seed, pop).map { _.toString }.mkString(",") + "\n")
+          }
+      }
+  } finally writer.close
+
 }
+
+
+
