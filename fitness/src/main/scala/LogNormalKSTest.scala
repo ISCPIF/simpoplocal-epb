@@ -10,12 +10,12 @@ import java.util.Random
 import umontreal.iro.lecuyer.probdist.LognormalDist
 import umontreal.iro.lecuyer.probdist._
 import umontreal.iro.lecuyer.gof.GofStat._
+import java.util.logging.{Level, Logger}
 
 object LogNormalKSTest {
 
   def evalKs(sample: Array[Double], dist: LognormalDist) = {
     val data = new DoubleArrayList(sample)
-
     val dataUnif = unifTransform(data, dist)
     dataUnif.quickSortFromTo(0, dataUnif.size - 1)
     kolmogorovSmirnov(dataUnif)(2)
@@ -33,27 +33,19 @@ object LogNormalKSTest {
       val res = evalKs(samples, dist)
 
       val resultTest: Array[Boolean] = Array.fill(2) { true }
+      if (res > getDCritical(samples.size, samples.size)) resultTest(0) = false
+      if (pValue(samples.size, res) < 0.05) resultTest(1) = false
 
-      if (res > getDCritical(samples.size, samples.size)) {
-        resultTest(0) = false
-      }
-
-      if (pValue(samples.size, res) < 0.05) {
-        resultTest(1) = false
-      }
-
-      return resultTest
+      resultTest
     } catch {
-      case e: IllegalArgumentException => println("Numeric instability problem with log computation into MLE ssj function : " + samples.mkString(","))
-      case _: Throwable => println("Another unknown error, try and fail to resolve 42 :/ ")
+      case e: IllegalArgumentException => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING, "Numeric instability problem with log computation into MLE ssj function : " + samples.mkString(","), e)
+      case e: Throwable => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING,"Another unknown error, try and fail to resolve 42 :/ ", e)
     }
     Array(false, false)
   }
 
   def getDCritical(sizeSampleA: Double, sizeSampleB: Double): Double = {
-    val alpha010 = 1.22
     val alpha005 = 1.36
-
     val dcritique = alpha005 * math.sqrt((sizeSampleA + sizeSampleB) / (sizeSampleA * sizeSampleB))
     dcritique
   }
