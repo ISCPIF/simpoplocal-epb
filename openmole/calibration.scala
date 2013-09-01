@@ -1,8 +1,7 @@
 // This workflow calibrate the simpop local model using a multi-objective
 // genetic algorithm
 
-logger.level("INFO")
-
+// Import namespaces of openmole plugins
 import org.openmole.plugin.domain.distribution._
 import org.openmole.plugin.domain.modifier._
 import org.openmole.plugin.task.groovy._
@@ -13,11 +12,13 @@ import org.openmole.plugin.builder.stochastic._
 import org.openmole.plugin.grouping.batch._
 import org.openmole.plugin.environment.glite._
 
+// Import model namespace
 import fr.geocite.simpoplocal.exploration._
 
+// Path where to store the results
 val resPath = "/iscpif/users/reuillon/work/Slocal/published_model/front/"
-//val resPath = "/tmp/"
 
+// Define the variables
 val seed = Prototype[Long]("seed")
 val rMax = Prototype[Double]("rMax")
 val distanceDecay = Prototype[Double]("distanceDecay")
@@ -37,6 +38,7 @@ val medTime = Prototype[Double]("medTime")
 val medADDeltaPop = Prototype[Double]("medADDeltaPop")
 val medADDeltaTime = Prototype[Double]("medADDeltaTime")
    
+// Define the task which runs the model
 val modelTask = 
   GroovyTask(
     "modelTask", "modelResult = Model.run(rMax,innovationImpact,distanceDecay,pCreation,pDiffusion, 10000, 4000, newRNG(seed)) \n")
@@ -51,6 +53,7 @@ modelTask.addInput(pDiffusion)
 modelTask.addInput(innovationImpact)
 modelTask.addOutput(modelResult)
 
+// Define the task which evaluate a single replication
 val evalTask = 
   GroovyTask("EvalTask",
     "lognorm = new LogNormalKSTest() \n" + 
@@ -69,11 +72,13 @@ evalTask.addOutput(ksValue)
 evalTask.addOutput(deltaPop)
 evalTask.addOutput(deltaTime)
     
+// Define the workflow that run the model and evaluate it
 val modelCapsule = Capsule(modelTask)
 val evalCapsule = Capsule(evalTask) 
 
 val eval = modelCapsule -- evalCapsule
 
+// Define the workflow that replicate the evaluation and aggregate the results
 val stat = Statistics()
 stat.addSum(ksValue, sumKsFailValue)
 stat.addMedian(deltaPop, medPop)
@@ -82,6 +87,7 @@ stat.addMedian(deltaTime, medTime)
 val seedFactor = Factor(seed, UniformLongDistribution() take 100)
 val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
 
+// Define an island
 import org.openmole.plugin.builder.evolution._
 import org.openmole.plugin.method.evolution._
 
@@ -101,22 +107,28 @@ val nsga2  =
     List(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
   )
 
+// Define the island model
 val islandModel = islandGA(nsga2)("island", 5000, GA.counter(200000), 50)
 
 val mole = islandModel
 
+// Define the execution environment
 val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
 
+// Define the hook to save the results
 val path = resPath
 val saveParetoHook = AppendToCSVFileHook(path + "pareto${" + islandModel.generation.name + "}.csv", islandModel.generation, islandModel.state, rMax.toArray, distanceDecay.toArray, pCreation.toArray, pDiffusion.toArray, innovationImpact.toArray, sumKsFailValue.toArray, medPop.toArray, medTime.toArray)
 
+// Define the hook to display the generation in the console
 val display = DisplayHook("Generation ${" + islandModel.generation.name + "}, convergence ${" + islandModel.state.name + "}")
 
+// Define the execution
 val ex = MoleExecution(
       mole,
       environments = Map(islandModel.island -> env),
       hooks = List(islandModel.outputCapsule -> saveParetoHook, islandModel.outputCapsule -> display)
     )
 
+// Lauch the execution
 ex.start
 
