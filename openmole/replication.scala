@@ -1,3 +1,6 @@
+// This workflow compute accurate fitnesses (using 10000 replications) for
+// set of parameters of the simpop local model.
+
 logger.level("FINE")
 
 import org.openmole.plugin.sampling.combine._
@@ -16,16 +19,15 @@ import org.openmole.plugin.source.file._
 
 import fr.geocite.simpoplocal.exploration._
 
-val resPath = "/iscpif/users/reuillon/work/Slocal/front_6_constraint/"
+val resPath = "/iscpif/users/reuillon/work/Slocal/published_model/front/"
 //val resPath = "/tmp/"
 
 val seed = Prototype[Long]("seed")
-val maxAbondance = Prototype[Double]("maxAbondance")
-val distanceF = Prototype[Double]("distanceF")
-val pSuccessInteraction = Prototype[Double]("pSuccessInteraction")
-val pSuccessAdoption = Prototype[Double]("pSuccessAdoption")
-//val inovationLife = Prototype[Double]("inovationLife")
-val innovationFactor = Prototype[Double]("innovationFactor")
+val rMax = Prototype[Double]("rMax")
+val distanceDecay = Prototype[Double]("distanceDecay")
+val pCreation = Prototype[Double]("pCreation")
+val pDiffusion = Prototype[Double]("pDiffusion")
+val innovationImpact = Prototype[Double]("innovationImpact")
 val modelResult = Prototype[ModelResult]("modelResult")
 
 val deltaTime = Prototype[Double]("deltaTime")
@@ -37,24 +39,24 @@ val medPop = Prototype[Double]("medPop")
 val medTime = Prototype[Double]("medTime")
 
 val sampling = 
-  maxAbondance.toArray.toFactor zip distanceF.toArray.toFactor zip pSuccessInteraction.toArray.toFactor zip pSuccessAdoption.toArray.toFactor zip innovationFactor.toArray.toFactor
+  rMax.toArray.toFactor zip distanceDecay.toArray.toFactor zip pCreation.toArray.toFactor zip pDiffusion.toArray.toFactor zip innovationImpact.toArray.toFactor
 
 val explo = ExplorationTask("explo", sampling)
 val exploCapsule = Capsule(explo)
 
 val modelTask = 
   GroovyTask(
-    "modelTask", "modelResult = Model.run(maxAbondance,innovationFactor,distanceF,pSuccessInteraction,pSuccessAdoption, 10000, 4000, newRNG(seed)) \n")
+    "modelTask", "modelResult = Model.run(rMax,innovationImpact,distanceDecay,pCreation,pDiffusion, 10000, 4000, newRNG(seed)) \n")
 
 modelTask.addImport("fr.geocite.simpoplocal.exploration.*")
 
-modelTask.addInput(maxAbondance)
-modelTask.addInput(distanceF)
+
+modelTask.addInput(rMax)
+modelTask.addInput(distanceDecay)
 modelTask.addInput(seed)
-modelTask.addInput(pSuccessInteraction)
-modelTask.addInput(pSuccessAdoption)
-//modelTask.addInput(inovationLife)
-modelTask.addInput(innovationFactor)
+modelTask.addInput(pCreation)
+modelTask.addInput(pDiffusion)
+modelTask.addInput(innovationImpact)
 modelTask.addOutput(modelResult)
 
 val evalTask = 
@@ -92,14 +94,14 @@ val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
 
 val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
 
-val saveHook = AppendToCSVFileHook(resPath + "replication10000.csv", maxAbondance, distanceF, pSuccessInteraction, pSuccessAdoption, innovationFactor, sumKsFailValue, medPop, medTime)
+val saveHook = AppendToCSVFileHook(resPath + "replication10000.csv", rMax, distanceDecay, pCreation, pDiffusion, innovationImpact, sumKsFailValue, medPop, medTime)
 
 val readCSV = CSVSource(resPath + "pareto100001.csv")
-readCSV addColumn maxAbondance
-readCSV addColumn distanceF
-readCSV addColumn pSuccessInteraction
-readCSV addColumn pSuccessAdoption
-readCSV addColumn innovationFactor
+readCSV addColumn rMax
+readCSV addColumn distanceDecay
+readCSV addColumn pCreation
+readCSV addColumn pDiffusion
+readCSV addColumn innovationImpact
 
 val ex = 
   ((exploCapsule source readCSV) -< replicateModel).toExecution(

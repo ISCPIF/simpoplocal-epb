@@ -1,3 +1,6 @@
+// This workflow calibrate the simpop local model using a multi-objective
+// genetic algorithm
+
 logger.level("INFO")
 
 import org.openmole.plugin.domain.distribution._

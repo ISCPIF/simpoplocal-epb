@@ -23,5 +23,5 @@ Get the plugin in your local ivy repository, for instance: /home/reuillon/.ivy2/
 
 To use it in OpenMoLE (www.openmole.org) launch OpenMoLE with: openmole -c -p /path/to/exploration_2.10.jar.
 
-Then you can use the workflow avialable in the workflow directory (it is compatible with OpenMoLE 0.9). This workflow is configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation.
+Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 0.9). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation.
 
