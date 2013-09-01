@@ -12,7 +12,6 @@ import org.openmole.plugin.hook.display._
 import org.openmole.plugin.builder.stochastic._
 import org.openmole.plugin.grouping.batch._
 import org.openmole.plugin.environment.glite._
-import org.openmole.plugin.environment.desktopgrid._
 
 import fr.geocite.simpoplocal.exploration._
 
@@ -127,4 +126,5 @@ val ex = MoleExecution(
       hooks = List(islandModel.outputCapsule -> saveParetoHook, islandModel.outputCapsule -> display)
     )
 
+ex.start
 
