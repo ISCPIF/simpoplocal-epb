@@ -38,6 +38,4 @@ To launch OpenMoLE in console mode and load the exploration jar :
 
 `openmole -c -p /path/to/exploration_2.10.jar`
 
-Then you can use the workflow available in the workflow directory (it is compatible with OpenMoLE 0.9). 
-
 Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 0.9). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation (you can find examples of workflows in the tutorial section on the openmole website).
