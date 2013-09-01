@@ -96,6 +96,11 @@ trait SimpopLocal {
    */
   implicit lazy val innovationOrdering = Ordering.by((_: Innovation).rootId)
 
+  /**
+   * Compute the initial state
+   * @param rng a random number generator
+   * @return the initial state of the simulation
+   */
   def initial(implicit rng: Random) =
     SimpopLocalState(0, readSettlements.map(_.toSettlement))
 
