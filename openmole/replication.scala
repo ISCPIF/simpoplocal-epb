@@ -1,8 +1,6 @@
 // This workflow compute accurate fitnesses (using 10000 replications) for
 // set of parameters of the simpop local model.
 
-logger.level("FINE")
-
 import org.openmole.plugin.sampling.combine._
 import org.openmole.plugin.domain.distribution._
 import org.openmole.plugin.domain.modifier._
@@ -20,7 +18,6 @@ import org.openmole.plugin.source.file._
 import fr.geocite.simpoplocal.exploration._
 
 val resPath = "/iscpif/users/reuillon/work/Slocal/published_model/front/"
-//val resPath = "/tmp/"
 
 val seed = Prototype[Long]("seed")
 val rMax = Prototype[Double]("rMax")
@@ -50,7 +47,6 @@ val modelTask =
 
 modelTask.addImport("fr.geocite.simpoplocal.exploration.*")
 
-
 modelTask.addInput(rMax)
 modelTask.addInput(distanceDecay)
 modelTask.addInput(seed)
@@ -59,13 +55,12 @@ modelTask.addInput(pDiffusion)
 modelTask.addInput(innovationImpact)
 modelTask.addOutput(modelResult)
 
+// Define the task which evaluate a single replication
 val evalTask = 
   GroovyTask("EvalTask",
-    "lognorm = new LogNormalKSTest() \n" + 
-    "ksValue =  new Double(lognorm.getResultTest(modelResult.population).count(false)) \n" + 
-    "deltaTest = new DeltaTest() \n" +  
-    "deltaPop = deltaTest.getResultTest(modelResult.population, 10000) \n" + 
-    "deltaTime = deltaTest.getResultTest(modelResult.time, 4000) \n"
+    "ksValue =  new Double(LogNormalKSTest.test(modelResult.population).count(false)) \n" + 
+    "deltaPop = DeltaTest.delta(modelResult.population, 10000) \n" + 
+    "deltaTime = DeltaTest.delta(modelResult.time, 4000) \n"
   )
 
 evalTask.addImport("fr.geocite.simpoplocal.*")
@@ -84,19 +79,19 @@ val eval = modelCapsule -- evalCapsule
 
 // STOCHASTICITY OUTPUT ///////////////////////////////////////////////
 
-val stat = new Statistics
+val stat = Statistics()
 stat.addSum(ksValue, sumKsFailValue)
 stat.addMedian(deltaPop, medPop)
 stat.addMedian(deltaTime, medTime)
 
-val seedFactor = Factor(seed, new UniformLongDistribution take 10000)
+val seedFactor = Factor(seed, UniformLongDistribution() take 10000)
 val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
 
 val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
 
 val saveHook = AppendToCSVFileHook(resPath + "replication10000.csv", rMax, distanceDecay, pCreation, pDiffusion, innovationImpact, sumKsFailValue, medPop, medTime)
 
-val readCSV = CSVSource(resPath + "pareto100001.csv")
+val readCSV = CSVSource(resPath + "pareto200001.csv")
 readCSV addColumn rMax
 readCSV addColumn distanceDecay
 readCSV addColumn pCreation
@@ -104,12 +99,8 @@ readCSV addColumn pDiffusion
 readCSV addColumn innovationImpact
 
 val ex = 
-  ((exploCapsule source readCSV) -< replicateModel).toExecution(
-      sources = Map(exploCapsule -> readCSV),
-      hooks = List(replicateModel.last -> saveHook),
-      environments = Map(modelCapsule -> env),
-      grouping = Map(modelCapsule -> new ByGrouping(500))
-  ) 
+  ((exploCapsule source readCSV) -< (replicateModel hook saveHook)) +
+   (modelCapsule on env by 500)) toExecution
 
 ex.start
 

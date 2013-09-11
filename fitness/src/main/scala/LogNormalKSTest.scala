@@ -10,7 +10,7 @@ import java.util.Random
 import umontreal.iro.lecuyer.probdist.LognormalDist
 import umontreal.iro.lecuyer.probdist._
 import umontreal.iro.lecuyer.gof.GofStat._
-import java.util.logging.{Level, Logger}
+import java.util.logging.{ Level, Logger }
 
 object LogNormalKSTest {
 
@@ -39,7 +39,7 @@ object LogNormalKSTest {
       return resultTest
     } catch {
       case e: IllegalArgumentException => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING, "Numeric instability problem with log computation into MLE ssj function : " + samples.mkString(","), e)
-      case e: Throwable => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING,"Another unknown error, try and fail to resolve 42 :/ ", e)
+      case e: Throwable => Logger.getLogger(LogNormalKSTest.getClass.getName).log(Level.WARNING, "Another unknown error, try and fail to resolve 42 :/ ", e)
     }
     Array(false, false)
   }
