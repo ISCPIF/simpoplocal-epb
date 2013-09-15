@@ -101,8 +101,8 @@ val nsga2  =
   steadyGA(evolution)(
     "calibrateModel",
     replicateModel, 
-    List(rMax -> ("2.0", "50000.0"), distanceDecay -> ("0.0", "4.0"), pCreation -> ("0.0" -> "0.01"), pDiffusion -> ("0.0", "0.01"),  innovationImpact -> ("0.0", "2.0")),
-    List(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
+    Seq(rMax -> ("2.0", "50000.0"), distanceDecay -> ("0.0", "4.0"), pCreation -> ("0.0" -> "0.01"), pDiffusion -> ("0.0", "0.01"),  innovationImpact -> ("0.0", "2.0")),
+    Seq(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
   )
 
 // Define the island model
@@ -118,7 +118,7 @@ val path = resPath
 val saveParetoHook = AppendToCSVFileHook(path + "pareto${" + islandModel.generation.name + "}.csv", islandModel.generation, islandModel.state, rMax.toArray, distanceDecay.toArray, pCreation.toArray, pDiffusion.toArray, innovationImpact.toArray, sumKsFailValue.toArray, medPop.toArray, medTime.toArray)
 
 // Define the hook to display the generation in the console
-val display = DisplayHook("Generation ${" + islandModel.generation.name + "}, convergence ${" + islandModel.state.name + "}")
+val display = DisplayHook("Generation ${" + islandModel.generation.name + "}")
 
 // Define the execution
 val ex = 

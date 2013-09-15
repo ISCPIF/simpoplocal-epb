@@ -63,7 +63,7 @@ val evalTask =
     "deltaTime = DeltaTest.delta(modelResult.time, 4000) \n"
   )
 
-evalTask.addImport("fr.geocite.simpoplocal.*")
+evalTask.addImport("fr.geocite.simpoplocal.exploration.*")
 evalTask.addImport("org.apache.commons.math.random.*")
 evalTask.addImport("umontreal.iro.lecuyer.probdist.*")
 
@@ -91,7 +91,7 @@ val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
 
 val saveHook = AppendToCSVFileHook(resPath + "replication10000.csv", rMax, distanceDecay, pCreation, pDiffusion, innovationImpact, sumKsFailValue, medPop, medTime)
 
-val readCSV = CSVSource(resPath + "pareto200001.csv")
+val readCSV = CSVSource(resPath + "pareto198000.csv")
 readCSV addColumn rMax
 readCSV addColumn distanceDecay
 readCSV addColumn pCreation
@@ -99,8 +99,7 @@ readCSV addColumn pDiffusion
 readCSV addColumn innovationImpact
 
 val ex = 
-  ((exploCapsule source readCSV) -< (replicateModel hook saveHook)) +
-   (modelCapsule on env by 500)) toExecution
+  (exploCapsule source readCSV) -< (replicateModel hook saveHook) + (modelCapsule on env by 1000) toExecution
 
 ex.start
 
