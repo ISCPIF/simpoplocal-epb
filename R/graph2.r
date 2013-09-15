@@ -19,7 +19,6 @@ writeRK <- function (path, file) {
   rk <- read.csv(String(path) + "//" + file)
   
   # Compute graphics
-  #rk_ordered <- ddply(rk, .(v_seed) , .fun= function(x) { rk[order(-rk$v_pop),] })
   rk_ordered <- ddply(rk, .(v_ticks), .fun= function(x) { x[order(-x$v_pop),] })
   rk_ranked = ddply(rk_ordered, .(v_ticks), transform, v_rank = sort(rank(v_pop, ties.method=c("first"))) )
   
@@ -28,6 +27,7 @@ writeRK <- function (path, file) {
   rk<- rk + coord_trans(x = "log10", y = "log10")
   rk<- rk + geom_line()
   rk <- rk + scale_y_continuous() + scale_x_continuous() + theme_bw()
+  rk <- rk + expand_limits(y= c(250 ,(15000)))
   rk <- rk + xlab("Rank of cities") + ylab("Population of cities")
  
   print("Saving " + svg_path + " in " + base_output + "\n") 
