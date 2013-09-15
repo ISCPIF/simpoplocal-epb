@@ -18,6 +18,7 @@ rk<- ggplot(rk_ranked, aes(x = v_rank,y=v_pop ))
 rk <- rk + geom_boxplot( aes(group = v_rank), size=0.2, fatten = 0.4 , outlier.colour = "red", outlier.size = 1.0) 
 rk <- rk + stat_summary(fun.y = mean,aes(shape="mean"), geom="point", color="red", shape=4) 
 rk <- rk + coord_trans(x = "log10", y = "log10") 
+rk <- rk + expand_limits(y= c(250 ,(15000)))
 rk <- rk + theme_bw() + xlab('Rank of cities') + ylab('Population of cities')
 
 print(basename(file_path_sans_ext(path)))

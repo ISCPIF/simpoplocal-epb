@@ -22,24 +22,19 @@ import java.io.{File, FileWriter, BufferedWriter, Writer}
 
 object WriteResultGraph1 extends App {
 
-  val replications = 5
+  val replications = 100
   val folderPath = "/tmp/"
   val file = folderPath + "variabilityRankSize_" + replications.toString() + ".csv"
 
   val writer = new BufferedWriter(new FileWriter(new File(file)))
 
   val m = new SimpopLocal {
-    def distanceDecay: Double = 0.6948037684879382
-
-    def innovationImpact: Double = 0.008514548363730353
-
+    def distanceDecay: Double = 0.6882107473716844
+    def innovationImpact: Double = 0.007879556611500305
     def maxInnovation: Double = 10000
-
-    def pCreation: Double = 8.672482701792705E-7
-
-    def pDiffusion: Double = 8.672482701792705E-7
-
-    def rMax: Double = 10586
+    def pCreation: Double = 1.2022185310640896E-6
+    def pDiffusion: Double = 7.405303653131592E-7
+    def rMax: Double = 10259.331894632433
   }
 
   val rng = new Random(42)
