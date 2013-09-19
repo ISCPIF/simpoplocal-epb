@@ -8,7 +8,7 @@ Page project website : http://iscpif.github.io/simpoplocal-epb/
 Licence
 -------
 
-This software is licenced under the GNU Affero GPLv3 software licence. 
+This software is licenced under the GNU Affero GPLv3 free software licence. 
 
 Usage (simulation)
 ------------------
