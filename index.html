@@ -31,14 +31,16 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>This project contains the source files to reproduce the results of experiments on the Simpop Local model.</p>
+        <p>This project contains the source files to reproduce the results of experiments on the Simpop Local model. This experiment is described in the paper:</p>
+
+<p>C. Schmitt, S. Rey,  R. Reuillon, D. Pumain, Half a billion simulations: Evolutionary algorithms and distributed computing for calibrating the SimpopLocal geographical model, submitted to EPB, under review, 2013.</p>
 
 <p>Page project website : <a href="http://iscpif.github.io/simpoplocal-epb/">http://iscpif.github.io/simpoplocal-epb/</a></p>
 
 <h2>
 <a name="licence" class="anchor" href="#licence"><span class="octicon octicon-link"></span></a>Licence</h2>
 
-<p>This software is licenced under the GNU Affero GPLv3 software licence. </p>
+<p>This software is licenced under the GNU Affero GPLv3 free software licence. </p>
 
 <h2>
 <a name="usage-simulation" class="anchor" href="#usage-simulation"><span class="octicon octicon-link"></span></a>Usage (simulation)</h2>
@@ -87,13 +89,13 @@ You need R with <code>ggplot2</code> installed to run correctly this two scripts
 
 <p>If you want to add more replication or change the default output for result in the graphic 1, you need to modify directly the two lines into scala file <code>WriteResultGraph1.scala</code> : </p>
 
-<div class="highlight"><pre>  <span class="k">val</span> <span class="n">replications</span> <span class="k">=</span> <span class="mi">5</span>
+<div class="highlight highlight-scala"><pre>  <span class="k">val</span> <span class="n">replications</span> <span class="k">=</span> <span class="mi">5</span>
   <span class="k">val</span> <span class="n">folderPath</span> <span class="k">=</span> <span class="s">"/tmp/"</span>
 </pre></div>
 
 <p>If you want to add more replications, change the frequency of data writer, or change the default output for result in the graphic 2, you need to modify directly the two lines into scala file <code>WriteResultGraph2.scala</code> : </p>
 
-<div class="highlight"><pre>  <span class="k">val</span> <span class="n">replications</span> <span class="k">=</span> <span class="mi">5</span>
+<div class="highlight highlight-scala"><pre>  <span class="k">val</span> <span class="n">replications</span> <span class="k">=</span> <span class="mi">5</span>
   <span class="k">val</span> <span class="n">folderPath</span> <span class="k">=</span> <span class="s">"/tmp/"</span>
   <span class="k">val</span> <span class="n">each</span> <span class="k">=</span> <span class="mi">10</span>
 </pre></div>
