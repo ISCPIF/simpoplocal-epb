@@ -19,7 +19,7 @@ package fr.geocite.simpoplocal.exploration
 
 import fr.geocite.simpoplocal.exploration.writer.CSVWriter
 import scala.util.Random
-import java.io.{File, FileWriter, BufferedWriter}
+import java.io.{ File, FileWriter, BufferedWriter }
 
 object WriteResultGraph2 extends App {
 
@@ -42,7 +42,7 @@ object WriteResultGraph2 extends App {
     seed =>
       val file = folderPath + "slocal_" + seed.toString() + ".csv"
       implicit val threadRng = new Random(seed)
-      new CSVWriter(file,0,seed,each).apply(m)(threadRng)
+      new CSVWriter(file, 0, seed, each).apply(m)(threadRng)
   }
 
 }

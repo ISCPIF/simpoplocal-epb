@@ -18,7 +18,7 @@
 import fr.geocite.simpoplocal.exploration.writer.CSVWriter
 import fr.geocite.simpoplocal.exploration.SimpopLocal
 import scala.util.Random
-import java.io.{File, FileWriter, BufferedWriter, Writer}
+import java.io.{ File, FileWriter, BufferedWriter, Writer }
 
 object WriteResultGraph1 extends App {
 
@@ -53,26 +53,23 @@ object WriteResultGraph1 extends App {
       new Q1(m.run, seed)
   }.seq
 
-
   println("Q1 max > " + simulation.map {
     _.final_step
   }.max)
 
   try {
-      writer.append("v_idn, v_ticks, v_seed, v_pop" + "\n")
+    writer.append("v_idn, v_ticks, v_seed, v_pop" + "\n")
 
-      simulation.map {
-        s =>
-          println("seed = " + s.seed)
-          s.pop.map {
-            case (id, pop) =>
-              //println(" / -> id = " + id +  " / pop = " + pop)
-              writer.append(List[Any](id, s.final_step, s.seed, pop).map { _.toString }.mkString(",") + "\n")
-          }
-      }
+    simulation.map {
+      s =>
+        println("seed = " + s.seed)
+        s.pop.map {
+          case (id, pop) =>
+            //println(" / -> id = " + id +  " / pop = " + pop)
+            writer.append(List[Any](id, s.final_step, s.seed, pop).map { _.toString }.mkString(",") + "\n")
+        }
+    }
   } finally writer.close
 
 }
-
-
 

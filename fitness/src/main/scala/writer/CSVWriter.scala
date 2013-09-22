@@ -17,11 +17,11 @@
 
 package fr.geocite.simpoplocal.exploration.writer
 
-import java.io.{File, FileWriter, BufferedWriter, Writer}
+import java.io.{ File, FileWriter, BufferedWriter, Writer }
 import fr.geocite.simpoplocal.exploration._
 import scala.util.Random
- 
-class CSVWriter(path: String, idExp:Int, seed:Long, each:Int = 0) {
+
+class CSVWriter(path: String, idExp: Int, seed: Long, each: Int = 0) {
 
   def apply(s: SimpopLocal)(implicit aprng: Random) = {
     val writer = new BufferedWriter(new FileWriter(new File(path)))
@@ -31,16 +31,15 @@ class CSVWriter(path: String, idExp:Int, seed:Long, each:Int = 0) {
     } finally writer.close
   }
 
-  def stepWriter(dataToWrite: SimpopLocal#SimpopLocalState, writer: Writer, each:Int) = {
+  def stepWriter(dataToWrite: SimpopLocal#SimpopLocalState, writer: Writer, each: Int) = {
     writer.synchronized {
       val cities = dataToWrite.settlements
       val year = dataToWrite.step
-      if ((each == 0) || ((year - 1) % each) == 0)
-      {
-       cities.map {
-         c => writer.append(List[Any](c.id, idExp, year, seed, c.population, c.innovations.size, c.x, c.y).map{_.toString}.mkString(",") + "\n")
-       }
-     }
+      if ((each == 0) || ((year - 1) % each) == 0) {
+        cities.map {
+          c => writer.append(List[Any](c.id, idExp, year, seed, c.population, c.innovations.size, c.x, c.y).map { _.toString }.mkString(",") + "\n")
+        }
+      }
     }
   }
 
