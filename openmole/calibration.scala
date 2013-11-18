@@ -91,9 +91,13 @@ import org.openmole.plugin.method.evolution._
 
 val evolution = 
   GA (
-    algorithm = GA.optimization(200, dominance = GA.strictEpsilon(0.0, 10.0, 10.0), diversityMetric = GA.hypervolume(500, 100000, 10000)),
+    algorithm = 
+      GA.optimization(
+        200, 
+        dominance = GA.strictEpsilon(0.0, 10.0, 10.0),
+        diversityMetric = GA.hypervolume(500, 100000, 10000),
+        termination = GA.timed("PT1H")),
     lambda = 1,
-    termination = GA.timed(60 * 60 * 1000),
     cloneProbability = 0.01
   )
 
