@@ -25,11 +25,11 @@ To execute a single run:
 
 To build and publish the OpenMoLE plugin:
 
-`sbt publish-local`
+`sbt osgi-bundle`
 
-Get the plugin in your local `~/.ivy2/` repository, for instance:
+Get the plugin in the`target` repository, for instance:
 
-`/home/reuillon/.ivy2/local/fr.geocite.simpoplocal/exploration_2.10/1.0.0/bundles/exploration_2.10.jar`
+`target/scala-2.11/exploration_2.11-1.0.0.jar`
 
 We use OpenMoLE to describe and launch our experimentation.
 
@@ -41,9 +41,9 @@ You can find multiple other great tutorials and examples of other applications o
 
 To launch OpenMoLE in console mode and load the exploration jar : 
 
-`openmole -c -p /path/to/exploration_2.10.jar`
+`openmole -c -p /path/to/exploration_2.11.jar`
 
-Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 0.9). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation (you can find examples of workflows in the tutorial section on the openmole website).
+Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 1.0). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation (you can find examples of workflows in the tutorial section on the openmole website).
 
 Usage (graphics)
 ----------------

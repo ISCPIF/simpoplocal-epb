@@ -8,7 +8,7 @@ import org.openmole.plugin.task.groovy._
 import org.openmole.plugin.domain.bounded._
 import org.openmole.plugin.hook.file._
 import org.openmole.plugin.hook.display._
-import org.openmole.plugin.builder.stochastic._
+import org.openmole.plugin.method.stochastic._
 import org.openmole.plugin.grouping.batch._
 import org.openmole.plugin.environment.glite._
 
@@ -86,40 +86,46 @@ val seedFactor = Factor(seed, UniformLongDistribution() take 100)
 val replicateModel = statistics("replicateModel", eval, seedFactor, stat)
 
 // Define an island
-import org.openmole.plugin.builder.evolution._
 import org.openmole.plugin.method.evolution._
+import ga._
+
+val scales = 
+  Seq(
+    rMax -> ("2.0", "50000.0"),
+    distanceDecay -> ("0.0", "4.0"),
+    pCreation -> ("0.0" -> "0.01"),
+    pDiffusion -> ("0.0", "0.01"),
+    innovationImpact -> ("0.0", "2.0")
+  )
 
 val evolution = 
-  GA (
-    algorithm = 
-      GA.optimization(
-        200, 
-        dominance = GA.strictEpsilon(0.0, 10.0, 10.0),
-        diversityMetric = GA.hypervolume(500, 100000, 10000),
-        termination = GA.timed("PT1H")),
-    lambda = 1,
-    cloneProbability = 0.01
+  Optimisation (
+    mu = 200,
+    dominance = StrictEpsilon(0.0, 10.0, 10.0)
+    termination = Timed(1 hour),
+    ranking = Pareto,
+    inputs = scales,
+    objectives = Seq(sumKsFailValue, medPop, medTime),
+    cloneProbability = 0.0
   )
 
 val nsga2  = 
   steadyGA(evolution)(
     "calibrateModel",
-    replicateModel, 
-    Seq(rMax -> ("2.0", "50000.0"), distanceDecay -> ("0.0", "4.0"), pCreation -> ("0.0" -> "0.01"), pDiffusion -> ("0.0", "0.01"),  innovationImpact -> ("0.0", "2.0")),
-    Seq(sumKsFailValue -> "0", medPop -> "0", medTime -> "0")
+    replicateModel
   )
 
 // Define the island model
-val islandModel = islandGA(nsga2)("island", 5000, GA.counter(200000), 50)
+val islandModel = islandGA(nsga2)("island", 5000, Counter(200000), 50)
 
 val mole = islandModel
 
 // Define the execution environment
-val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = "PT4H")
+val env = GliteEnvironment("biomed", openMOLEMemory = 1400, wallTime = 4 hours)
 
 // Define the hook to save the results
 val path = resPath
-val saveParetoHook = AppendToCSVFileHook(path + "pareto${" + islandModel.generation.name + "}.csv", islandModel.generation, islandModel.state, rMax.toArray, distanceDecay.toArray, pCreation.toArray, pDiffusion.toArray, innovationImpact.toArray, sumKsFailValue.toArray, medPop.toArray, medTime.toArray)
+val savePopulation = SavePopulationHook(islandModel, path + "/populations/")
 
 // Define the hook to display the generation in the console
 val display = DisplayHook("Generation ${" + islandModel.generation.name + "}")
@@ -128,7 +134,7 @@ val display = DisplayHook("Generation ${" + islandModel.generation.name + "}")
 val ex = 
   (mole + 
    (islandModel.island on env) + 
-   (islandModel.outputCapsule hook saveParetoHook hook display)) toExecution
+   (islandModel.outputCapsule hook savePopulation hook display)) toExecution
 
 // Lauch the execution
 ex.start
