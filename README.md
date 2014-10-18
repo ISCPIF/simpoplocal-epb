@@ -1,7 +1,9 @@
 
 This project contains the source files to reproduce the results of experiments on the Simpop Local model. This experiment is described in the paper:
 
-  C. Schmitt, S. Rey,  R. Reuillon, D. Pumain, Half a billion simulations: Evolutionary algorithms and distributed computing for calibrating the SimpopLocal geographical model, submitted to EPB, under review, 2013.
+  C. Schmitt, S. Rey,  R. Reuillon, D. Pumain, Half a billion simulations: Evolutionary algorithms and distributed computing for calibrating the SimpopLocal geographical model, submitted to EPB, in publication, 2013.
+
+You can find a preprint version here : http://www.openmole.org/files/Schmitt2014.pdf
 
 Page project website : http://iscpif.github.io/simpoplocal-epb/
 
