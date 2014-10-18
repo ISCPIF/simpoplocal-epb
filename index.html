@@ -2,9 +2,9 @@
 <html>
 
   <head>
-    <meta charset='utf-8' />
-    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Simpoplocal-epb : " />
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Simpoplocal-epb : ">
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -33,7 +33,9 @@
       <section id="main_content" class="inner">
         <p>This project contains the source files to reproduce the results of experiments on the Simpop Local model. This experiment is described in the paper:</p>
 
-<p>C. Schmitt, S. Rey,  R. Reuillon, D. Pumain, Half a billion simulations: Evolutionary algorithms and distributed computing for calibrating the SimpopLocal geographical model, submitted to EPB, under review, 2013.</p>
+<p>C. Schmitt, S. Rey,  R. Reuillon, D. Pumain, Half a billion simulations: Evolutionary algorithms and distributed computing for calibrating the SimpopLocal geographical model, submitted to EPB, in publication, 2013.</p>
+
+<p>You can find a preprint version here : <a href="http://www.openmole.org/files/Schmitt2014.pdf">http://www.openmole.org/files/Schmitt2014.pdf</a></p>
 
 <p>Page project website : <a href="http://iscpif.github.io/simpoplocal-epb/">http://iscpif.github.io/simpoplocal-epb/</a></p>
 
@@ -57,11 +59,11 @@
 
 <p>To build and publish the OpenMoLE plugin:</p>
 
-<p><code>sbt publish-local</code></p>
+<p><code>sbt osgi-bundle</code></p>
 
-<p>Get the plugin in your local <code>~/.ivy2/</code> repository, for instance:</p>
+<p>Get the plugin in the<code>target</code> repository, for instance:</p>
 
-<p><code>/home/reuillon/.ivy2/local/fr.geocite.simpoplocal/exploration_2.10/1.0.0/bundles/exploration_2.10.jar</code></p>
+<p><code>target/scala-2.11/exploration_2.11-1.0.0.jar</code></p>
 
 <p>We use OpenMoLE to describe and launch our experimentation.</p>
 
@@ -75,9 +77,9 @@
 
 <p>To launch OpenMoLE in console mode and load the exploration jar : </p>
 
-<p><code>openmole -c -p /path/to/exploration_2.10.jar</code></p>
+<p><code>openmole -c -p /path/to/exploration_2.11.jar</code></p>
 
-<p>Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 0.9). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation (you can find examples of workflows in the tutorial section on the openmole website).</p>
+<p>Then you can use the workflows avialable in the openmole directory (it is compatible with OpenMoLE 1.0). Those workflows are configured to run on the biomed VO of the grid EGI, however switching the execution environment in OpenMoLE is easy so you can use this workflow on you own multi-core machine, cluster or grid virtual organisation (you can find examples of workflows in the tutorial section on the openmole website).</p>
 
 <h2>
 <a name="usage-graphics" class="anchor" href="#usage-graphics"><span class="octicon octicon-link"></span></a>Usage (graphics)</h2>
